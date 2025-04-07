@@ -39,6 +39,7 @@ dependencies:
 
   google_maps_flutter: ^2.12.1 # For displaying Google Maps
   cloud_firestore: ^4.15.9    # For accessing Firestore database
+  google_generative_ai: ^0.4.1 # Or latest version
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -49,6 +50,7 @@ dependencies:
   # permission_handler: ^11.0.1
   image_picker: ^1.0.7 # Use latest compatible version
   # You can likely remove the 'camera:' dependency now if not used elsewhere
+  flutter_dotenv: ^5.1.0 # Or the latest version from pub.dev
 
 dev_dependencies:
   flutter_test:
