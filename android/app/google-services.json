@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "449895393030",
+    "project_id": "nutrifyzero",
+    "storage_bucket": "nutrifyzero.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449895393030:android:37181ae4ec0eb95c16a087",
+        "android_client_info": {
+          "package_name": "com.example.nutrify_zero"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449895393030-9jt7bsnbiakjtnaq3t8pqolene8ca77a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nutrify_zero",
+            "certificate_hash": "4c51a92f13d9aedbc1756f2ea3fd701e0a9e4d7e"
+          }
+        },
+        {
+          "client_id": "449895393030-o6cot318gvov78j8muipl8688actbu29.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSu8YqiM6z9wSHtLOIYvlCuYh3TN1Z7Dw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449895393030-o6cot318gvov78j8muipl8688actbu29.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "449895393030-peuopqo00pochh9vgir096ejltjjq1u2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nutrifyZero"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

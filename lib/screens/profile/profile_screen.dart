@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 
 // Import shared widgets (Adjust paths if necessary)
 import '../../widgets/custom_app_bar.dart';
-// Removed BottomNavBar import as it's usually not shown on profile screen itself
+// Removed BottomNavBar import
 // import '../../widgets/bottom_nav_bar.dart';
 
 // Import target screens for navigation (Adjust paths if necessary)
 import 'exchange_points_screen.dart';
 import 'points_transaction_screen.dart';
+import '../auth/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart'; // Import Google Sign-In
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key}); // Use const constructor
+  const ProfileScreen({super.key});
 
   // --- Helper for Action Boxes (Points Transaction, Exchange) ---
   Widget _buildProfileActionBox({
@@ -20,15 +23,14 @@ class ProfileScreen extends StatelessWidget {
     required Color backgroundColor,
     required Widget targetScreen,
   }) {
-    return Expanded( // Use Expanded to make boxes share width
+    return Expanded(
       child: GestureDetector(
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => targetScreen),
         ),
         child: Container(
-          // height: 120, // Optional: Set a fixed height or let content decide
-          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 8.0), // Adjust padding
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 8.0),
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(12.0),
@@ -41,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, size: 36, color: Colors.white),
               const SizedBox(height: 10),
@@ -61,35 +63,64 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // --- Logout Dialog Logic --- (Keep as is)
+  // --- Updated Logout Dialog Logic ---
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      // barrierDismissible: false, // Optional: prevent dismissing by tapping outside
+      builder: (dialogContext) => AlertDialog( // Use dialogContext for clarity
         title: const Text('Logout?'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
             child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context),
+            // Use dialogContext to pop only the dialog
+            onPressed: () => Navigator.pop(dialogContext),
           ),
           TextButton(
             child: const Text('Logout', style: TextStyle(color: Colors.red)),
-            onPressed: () {
-              print("Logout Action Triggered"); // Placeholder
-              // TODO: Implement actual logout logic (clear auth state, etc.)
+            // --- Make onPressed async ---
+            onPressed: () async {
+              print("Logout Action Triggered");
+              Navigator.pop(dialogContext); // Close dialog first
 
-              // Navigate back to initial route (e.g., login or home) and remove history
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                 '/', // Or your initial route like '/home' or '/'
-                 (Route<dynamic> route) => false, // Remove all routes
-               );
+              try {
+                 // Sign out from Google
+                 await GoogleSignIn().signOut();
+                 print("Signed out from Google");
+
+                 // Sign out from Firebase
+                 await FirebaseAuth.instance.signOut();
+                 print("Signed out from Firebase");
+
+                 // *** RESTORE NAVIGATION TO LOGIN SCREEN ***
+                 if (context.mounted) {
+                     Navigator.of(context).pushAndRemoveUntil(
+                         MaterialPageRoute(builder: (context) => const LoginScreen()), // Go back to LoginScreen
+                         (Route<dynamic> route) => false, // Remove all routes
+                     );
+                     // Optional: If using named routes and '/login' is defined
+                     // Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                 }
+                 // *** END RESTORED NAVIGATION ***
+
+              } catch (e) {
+                 print("Error during logout: $e");
+                 if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                       SnackBar(
+                          content: Text('Logout failed: $e'),
+                          backgroundColor: Colors.red,
+                       ),
+                    );
+                 }
+              }
             },
           ),
         ],
       ),
     );
-  }
+  } // --- End of _showLogoutDialog ---
 
 
   @override
@@ -97,20 +128,25 @@ class ProfileScreen extends StatelessWidget {
      // --- Define Colors ---
     const Color primaryGreen = Color(0xFF4CAF50);
     const Color primaryRed = Color(0xFFE53935);
-    // Example BlueGrey - Adjust shade as needed (Colors.blueGrey[300]?)
     final Color blueGrey = Colors.blueGrey.shade300;
     const Color subtitleColor = Colors.black54;
 
-    // --- Placeholder User Data --- (Replace with actual data)
-    const String userName = 'Alice Smith';
-    const String userEmail = 'alice.smith456@example.email.com';
-    const String userImageUrl = 'https://placekitten.com/g/200/200'; // Placeholder
-    const int userPoints = 1000;
+    // Get current user from Firebase Auth
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    // --- Use user data (provide defaults if null) ---
+    final String userName = currentUser?.displayName ?? 'User Name';
+    final String userEmail = currentUser?.email ?? 'user@example.com';
+    final String? userImageUrl = currentUser?.photoURL; // Already nullable
+    // Fetch points separately if needed
+    const int userPoints = 1000; // Keep placeholder or fetch actual points
+
+    // Check validity for image
+    final bool hasValidImageUrl = userImageUrl != null && userImageUrl.isNotEmpty;
+
 
     return Scaffold(
-      // Show back button? Depends if user navigates TO profile or if it's a root tab
-      // Let's assume it's navigated TO, so back button is okay.
-      appBar: const CustomAppBar(showBackButton: true),
+      appBar: const CustomAppBar(showBackButton: true), // Show back button here
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
         child: Column(
@@ -122,7 +158,7 @@ class ProfileScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: primaryGreen, // Red title
+                color: primaryGreen, // Use primaryRed for Profile Title
               ),
             ),
              const Divider(height: 25, thickness: 1),
@@ -136,19 +172,38 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 child: Row(
                    children: [
+                      // --- MODIFIED CircleAvatar ---
                       CircleAvatar(
-                         radius: 28, // Adjust size
-                         backgroundColor: Colors.white.withOpacity(0.5),
-                         backgroundImage: NetworkImage(userImageUrl),
-                         onBackgroundImageError: (e, s) => print("Error loading image: $e"), // Handle error
+                        radius: 28,
+                        backgroundColor: Colors.green.shade700, // Fallback color
+
+                        // Conditionally set backgroundImage based on the check
+                        backgroundImage: hasValidImageUrl ? NetworkImage(userImageUrl!) : null,
+
+                        
+
+                        onBackgroundImageError: hasValidImageUrl ? (exception, stackTrace) {
+                          print("Error loading profile image: $exception");
+                        } : null,
+
+                        // Provide the child placeholder - shows if backgroundImage is null/fails
+                        child: !hasValidImageUrl
+                            ? Icon( // Show icon if NO valid URL initially
+                                Icons.person_outline,
+                                size: 32,
+                                color: Colors.white.withOpacity(0.8),
+                              )
+                            : null, // Rely on backgroundImage otherwise
                       ),
+                      // --- End MODIFIED CircleAvatar ---
+
                       const SizedBox(width: 16),
                       Expanded(
                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                                Text(
-                                  userName,
+                                  userName, // Use placeholder data
                                   style: const TextStyle(
                                      color: Colors.white,
                                      fontSize: 18,
@@ -157,7 +212,7 @@ class ProfileScreen extends StatelessWidget {
                                ),
                                const SizedBox(height: 4),
                                Text(
-                                  userEmail,
+                                  userEmail, // Use placeholder data
                                   style: TextStyle(
                                      color: Colors.white.withOpacity(0.9),
                                      fontSize: 13,
@@ -244,8 +299,10 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-      // Removed BottomNavBar from Profile screen
-      // bottomNavigationBar: CustomBottomNavBar(currentIndex: ???), // Decide index if needed
     );
   }
 }
+
+// Make sure ExchangePointsScreen and PointsTransactionScreen are imported correctly
+// class ExchangePointsScreen extends StatelessWidget { ... } // Placeholder
+// class PointsTransactionScreen extends StatelessWidget { ... } // Placeholder
