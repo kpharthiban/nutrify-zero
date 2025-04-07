@@ -9,8 +9,6 @@ import 'screens/discover/discover_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/auth/login_screen.dart';
-// Import the custom builder if it's in a separate file
-// import 'utils/custom_page_transition.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'firebase_options.dart'; // Import generated options
 
