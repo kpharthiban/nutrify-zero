@@ -11,14 +11,35 @@ import 'screens/auth/auth_wrapper.dart';
 import 'screens/auth/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'firebase_options.dart'; // Import generated options
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // <-- Import dotenv
 
-void main() async { // Make main async
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are ready
-  await Firebase.initializeApp( // Initialize Firebase
-    options: DefaultFirebaseOptions.currentPlatform, // Use generated options
+Future<void> main() async { // Make main async
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // --- Load the .env file ---
+  try {
+     await dotenv.load(fileName: ".env");
+     print(".env file loaded successfully.");
+  } catch (e) {
+     print("Error loading .env file: $e"); // Handles error if the file is missing
+  }
+  // --- End Load .env ---
+
+  // Initialize Firebase (ensure it happens after dotenv if Firebase config needs env vars)
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp()); // Run your app
+
+  runApp(const MyApp());
 }
+
+// void main() async { // Make main async
+//   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are ready
+//   await Firebase.initializeApp( // Initialize Firebase
+//     options: DefaultFirebaseOptions.currentPlatform, // Use generated options
+//   );
+//   runApp(const MyApp()); // Run your app
+// }
 
 // --- Custom Fade Transition Builder --- (Keep this definition)
 class FadePageTransitionsBuilder extends PageTransitionsBuilder {
