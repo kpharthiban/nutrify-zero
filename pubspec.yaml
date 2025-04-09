@@ -62,6 +62,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1 # Use latest version from pub.dev
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -108,3 +109,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Configuration for flutter_launcher_icons
+flutter_launcher_icons:
+  # Android Settings
+  android: true # Generate Android icons (can also be "launcher_icon")
+  ios: true     # Generate iOS icons
+
+  # Path to your source logo image
+  image_path: "assets/logo/app_icon.png" # <<< IMPORTANT: Update this path!
+
+  # (Optional) Minimum SDK for Android Adaptive Icons (Recommended: 21 or higher)
+  min_sdk_android: 21
+
+  # (Optional) Settings for Android Adaptive Icons (Android 8.0+)
+  # If your main logo doesn't look good with shapes applied, you might need these.
+  # adaptive_icon_background: "#4CAF50" # Hex color for the background layer (e.g., your primary green)
+  # adaptive_icon_foreground: "assets/logo/app_icon_foreground.png" # A separate foreground asset (often the logo shape without background)
+
+# Ensure this flutter_launcher_icons: section has no indentation from the left margin
