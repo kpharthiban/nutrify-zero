@@ -19,7 +19,7 @@ You can install Nutrify Zero on your Android device by downloading the `.apk` fi
 **3. Install the App:**
 
 * Open your device's file manager app and navigate to your `Downloads` folder (or wherever you saved the `.apk` file).
-* Tap on the downloaded `nutrify-zero-v1.1.0.apk` file.
+* Tap on the downloaded `nutrify-zero-temp-release.apk` file.
 * Follow the on-screen prompts to install the application.
 
 ## Running the App
